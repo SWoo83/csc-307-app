@@ -15,6 +15,12 @@ function MyApp() {
 
   function updateList(person) {
     postUser(person)
+      .then((res) => {
+        if (res.status !== 201) { //Check for 201 Created
+          return res.json(); 
+        } else
+          throw new Error("Could not add user."); //Trigger catch block on error
+      })
       .then(() => setCharacters([...characters, person]))
       .catch((error) => {
         console.log(error);
@@ -35,6 +41,13 @@ function MyApp() {
       body: JSON.stringify(person),
     });
 
+    return promise;
+  }
+
+  function deleteUser(id) {
+    const promise = fetch(`http://localhost:8000/users/${id}`, {
+      method: "DELETE",
+    });
     return promise;
   }
 

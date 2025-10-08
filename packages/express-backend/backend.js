@@ -74,10 +74,26 @@ const addUser = (user) => {
   return user;
 };
 
+const newId = () => Math.random().toString(36).substring(2, 8);
+
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  userToAdd.id = newId(); //Assign a new ID
+  addUser(userToAdd); //Add to "database"
+  res.status(201).send(userToAdd); //201 Created
+});
+
+app.delete("/users/:id", (req, res) => {
+    const id = req.params["id"];
+    const user = findUserById(id);
+    if (user === undefined) { //If id not found
+      res.status(404).send("Resource not found.");
+    } else {
+        users["users_list"] = users["users_list"].filter(
+          (user) => user["id"] !== id //Similar to java stream filter(
+        );
+        res.status(204).send(); //204 and send nothing
+    }
 });
 
 //Get Users
