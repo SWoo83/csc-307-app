@@ -4,6 +4,11 @@ import cors from "cors";
 
 const app = express();
 const port = 8000; //Possibly change later to desired number to avoid conflict
+
+//Middleware must be added before routes
+app.use(cors());
+app.use(express.json());
+
 const users = {
   users_list: [
     {
@@ -75,9 +80,6 @@ app.post("/users", (req, res) => {
   res.send();
 });
 
-app.use(cors());
-app.use(express.json());
-
 //Get Users
 app.get("/users", (req, res) => {
   res.send(users);
@@ -92,3 +94,4 @@ app.listen(port, () => {
     `Example app listening at http://localhost:${port}`
   );
 });
+
