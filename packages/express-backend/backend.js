@@ -1,8 +1,14 @@
 // backend.js
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000; //Possibly change later to desired number to avoid conflict
+
+//Middleware must be added before routes
+app.use(cors());
+app.use(express.json());
+
 const users = {
   users_list: [
     {
@@ -68,13 +74,27 @@ const addUser = (user) => {
   return user;
 };
 
+const newId = () => Math.random().toString(36).substring(2, 8);
+
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  userToAdd.id = newId(); //Assign a new ID
+  addUser(userToAdd); //Add to "database"
+  res.status(201).send(userToAdd); //201 Created
 });
 
-app.use(express.json());
+app.delete("/users/:id", (req, res) => {
+    const id = req.params["id"];
+    const user = findUserById(id);
+    if (user === undefined) { //If id not found
+      res.status(404).send("Resource not found.");
+    } else {
+        users["users_list"] = users["users_list"].filter(
+          (user) => user["id"] !== id //Similar to java stream filter(
+        );
+        res.status(204).send(); //204 and send nothing
+    }
+});
 
 //Get Users
 app.get("/users", (req, res) => {
@@ -90,3 +110,4 @@ app.listen(port, () => {
     `Example app listening at http://localhost:${port}`
   );
 });
+
